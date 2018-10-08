@@ -12,4 +12,8 @@ public class MensagemServidor {
     private Status status;
     private Tipo tipo;
     private String[][] tabuleiro;
+
+    public boolean isGameOver() {
+        return status != Status.JOGANDO;
+    }
 }
