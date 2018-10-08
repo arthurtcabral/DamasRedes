@@ -42,7 +42,7 @@ public class GameProps {
             clientProperties = new Properties();
             clientProperties.load(clientInput);
         } catch (IOException e) {
-            log.error("Problema na leitura do arquivo de properties", e);
+//            log.error("Problema na leitura do arquivo de properties", e);
         }
     }
 }
