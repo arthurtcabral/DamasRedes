@@ -55,8 +55,7 @@ public class Cliente {
     }
 
     private MensagemServidor waitForMessage() {
-        try {
-            ObjectInputStream fromServer = new ObjectInputStream(server.getInputStream());
+        try (ObjectInputStream fromServer = new ObjectInputStream(server.getInputStream())) {
             return (MensagemServidor) fromServer.readObject();
         } catch (IOException | ClassNotFoundException e) {
             log.error("Problema na leitura do socket do servidor.", e);
@@ -65,8 +64,7 @@ public class Cliente {
     }
 
     private void enviarJogada(MensagemCliente jogada) {
-        try {
-            ObjectOutputStream toServer = new ObjectOutputStream(server.getOutputStream());
+        try (ObjectOutputStream toServer = new ObjectOutputStream(server.getOutputStream())) {
             toServer.writeObject(jogada);
         } catch (IOException e) {
             log.error("Problema na escrita do socket do servidor.", e);

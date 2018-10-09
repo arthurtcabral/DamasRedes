@@ -1,5 +1,6 @@
 package br.com.unisinos.damasredes;
 
+import br.com.unisinos.damasredes.mensagem.MensagemCliente;
 import br.com.unisinos.damasredes.mensagem.MensagemServidor;
 import br.com.unisinos.damasredes.mensagem.Status;
 import br.com.unisinos.damasredes.mensagem.Tipo;
@@ -8,6 +9,7 @@ import lombok.extern.log4j.Log4j;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -32,12 +34,18 @@ public class Servidor {
                 .tipo(Tipo.INFORMACAO)
                 .build();
 
-        ObjectInputStream doCliente = new ObjectInputStream(
-                servidor.clientA.getInputStream());
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(servidor.getClientA().getOutputStream())) {
+            outputStream.writeObject(mensagemInicio);
+        }
 
-        Cliente jogadorA = (Cliente) doCliente.readObject();
-        System.out.println(jogadorA.getPosicaoDeOrigem()[0]);
-        System.out.println(jogadorA.getPosicaoDeOrigem()[1]);
+        try (ObjectInputStream inputStream = new ObjectInputStream(servidor.getClientA().getInputStream())) {
+            MensagemCliente mensagem = (MensagemCliente) inputStream.readObject();
+            System.out.println(mensagem.toString());
+        }
+
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(servidor.getClientA().getOutputStream())) {
+            outputStream.writeObject(mensagemVitoria);
+        }
 
         servidor.closeConnections();
     }
