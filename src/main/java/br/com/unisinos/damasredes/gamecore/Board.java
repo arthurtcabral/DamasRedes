@@ -32,7 +32,7 @@ public class Board {
 	}
 
 	private boolean canMove(int turn, Point startPosition, Point endPosition) {
-		if ((turn == 1 && endPosition.y > startPosition.y) !! (turn == 2 && endPosition.y < startPosition.y)) {
+		if ((turn == 1 && endPosition.y > startPosition.y) || (turn == 2 && endPosition.y < startPosition.y)) {
 			return false;
 		}
 		if (!(endPosition.x == startPosition.x + 1 || endPosition.x == startPosition.x -1)
