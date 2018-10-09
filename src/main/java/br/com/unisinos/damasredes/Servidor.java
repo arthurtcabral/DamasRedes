@@ -1,6 +1,9 @@
 package br.com.unisinos.damasredes;
 
+import br.com.unisinos.damasredes.mensagem.MensagemServidor;
 import br.com.unisinos.damasredes.mensagem.Status;
+import br.com.unisinos.damasredes.mensagem.Tipo;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 
 import java.io.IOException;
@@ -9,10 +12,25 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 @Log4j
+@Getter
 public class Servidor {
 
     public static void main(String[] args) throws ClassNotFoundException, IOException {
         Servidor servidor = new Servidor();
+
+        MensagemServidor mensagemInicio = MensagemServidor.builder()
+                .mensagem("")
+                .status(Status.JOGANDO)
+                .tabuleiro(servidor.getTabuleiro())
+                .tipo(Tipo.JOGADA)
+                .build();
+
+        MensagemServidor mensagemVitoria = MensagemServidor.builder()
+                .mensagem("Parabéns!")
+                .status(Status.GANHOU)
+                .tabuleiro(servidor.getTabuleiro())
+                .tipo(Tipo.INFORMACAO)
+                .build();
 
         ObjectInputStream doCliente = new ObjectInputStream(
                 servidor.clientA.getInputStream());
@@ -31,7 +49,7 @@ public class Servidor {
     private Socket server;
     private String tabuleiro[][];
 
-    public Servidor() {
+    private Servidor() {
         start();
     }
 
@@ -71,7 +89,7 @@ public class Servidor {
         }
     }
 
-    public void closeConnections() {
+    private void closeConnections() {
         System.out.println("Fechando conexões com clients.");
         try {
             clientA.close();

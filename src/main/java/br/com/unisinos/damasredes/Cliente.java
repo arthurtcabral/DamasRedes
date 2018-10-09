@@ -2,15 +2,14 @@ package br.com.unisinos.damasredes;
 
 import br.com.unisinos.damasredes.mensagem.MensagemCliente;
 import br.com.unisinos.damasredes.mensagem.MensagemServidor;
-import br.com.unisinos.damasredes.mensagem.Status;
 import br.com.unisinos.damasredes.mensagem.Tipo;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Scanner;
 
 import static br.com.unisinos.damasredes.frontend.ScreenHelper.*;
 
@@ -23,22 +22,27 @@ public class Cliente {
     private Socket server;
 
     public static void main(String[] args) {
-        Cliente servidor = new Cliente();
+        Cliente cliente = new Cliente();
 
         while (true) {
-            MensagemServidor mensagem = servidor.waitForMessage();
+            MensagemServidor mensagem = cliente.waitForMessage();
+
+            printGameScreen(mensagem);
+
             if (mensagem.isGameOver()) {
-                servidor.endGame(mensagem);
+                endGame(mensagem);
                 break;
             }
 
-            printGameScreen(mensagem);
             if (mensagem.getTipo() == Tipo.INFORMACAO) {
                 notificarTurnoAdversario();
             } else {
                 MensagemCliente jogada = aguardarJogada();
+                cliente.enviarJogada(jogada);
             }
         }
+
+        cliente.closeConnection();
     }
 
     private Cliente() {
@@ -51,14 +55,22 @@ public class Cliente {
     }
 
     private MensagemServidor waitForMessage() {
-        return null;
+        try {
+            ObjectInputStream fromServer = new ObjectInputStream(server.getInputStream());
+            return (MensagemServidor) fromServer.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            log.error("Problema na leitura do socket do servidor.", e);
+            throw new RuntimeException("Problema na leitura do socket do servidor", e);
+        }
     }
 
-    private void endGame(MensagemServidor mensagem) {
-        if (mensagem.getStatus() == Status.GANHOU) {
-
-        } else {
-
+    private void enviarJogada(MensagemCliente jogada) {
+        try {
+            ObjectOutputStream toServer = new ObjectOutputStream(server.getOutputStream());
+            toServer.writeObject(jogada);
+        } catch (IOException e) {
+            log.error("Problema na escrita do socket do servidor.", e);
+            throw new RuntimeException("Problema na escrita do socket do servidor", e);
         }
     }
 
@@ -80,16 +92,12 @@ public class Cliente {
         return Integer.parseInt(port);
     }
 
-    private void jogar(BufferedReader doServidor) {
-        // TODO: Apresentar tabuleiro.
-        // TODO: Ler informa��es oriundas da l�gica de jogo do servidor
-        Scanner teclado = new Scanner(System.in);
-        System.out.println("Informe a linha e a coluna da posi��o de origem: ");
-        this.posicaoDeOrigem[0] = teclado.nextInt();
-        this.posicaoDeOrigem[1] = teclado.nextInt();
-
-        System.out.println("Informe a linha e a coluna da posi��o de destino: ");
-        this.posicaoDeDestino[0] = teclado.nextInt();
-        this.posicaoDeDestino[1] = teclado.nextInt();
+    private void closeConnection() {
+        System.out.println("Fechando conexão com servidor.");
+        try {
+            server.close();
+        } catch (IOException e) {
+            log.error("Erro no fechamento do socket", e);
+        }
     }
 }
