@@ -5,6 +5,7 @@ import br.com.unisinos.damasredes.mensagem.MensagemServidor;
 import br.com.unisinos.damasredes.mensagem.Tipo;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
+import org.apache.log4j.BasicConfigurator;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,6 +26,7 @@ public class Cliente {
         Cliente cliente = new Cliente();
 
         while (true) {
+            BasicConfigurator.configure();
             MensagemServidor mensagem = cliente.waitForMessage();
 
             printGameScreen(mensagem);
@@ -55,7 +57,8 @@ public class Cliente {
     }
 
     private MensagemServidor waitForMessage() {
-        try (ObjectInputStream fromServer = new ObjectInputStream(server.getInputStream())) {
+        try {
+            ObjectInputStream fromServer = new ObjectInputStream(server.getInputStream());
             return (MensagemServidor) fromServer.readObject();
         } catch (IOException | ClassNotFoundException e) {
             log.error("Problema na leitura do socket do servidor.", e);
@@ -64,8 +67,10 @@ public class Cliente {
     }
 
     private void enviarJogada(MensagemCliente jogada) {
-        try (ObjectOutputStream toServer = new ObjectOutputStream(server.getOutputStream())) {
+        try {
+            ObjectOutputStream toServer = new ObjectOutputStream(server.getOutputStream());
             toServer.writeObject(jogada);
+            toServer.flush();
         } catch (IOException e) {
             log.error("Problema na escrita do socket do servidor.", e);
             throw new RuntimeException("Problema na escrita do socket do servidor", e);

@@ -7,17 +7,13 @@ import java.util.regex.Pattern;
 @Getter
 public class ParCoordenadas {
 
-    private boolean valido;
+    private boolean valido = false;
     private int x;
     private int y;
 
     private static final Pattern PATTERN = Pattern.compile("\\d+,\\d+");
 
-    public ParCoordenadas(String input) {
-        processar(input);
-    }
-
-    private void processar(String input) {
+    public void processar(String input) {
         if (input == null || PATTERN.matcher(input).matches()) {
             valido = true;
             String[] numbers = input.split(",");

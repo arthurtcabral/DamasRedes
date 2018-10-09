@@ -6,6 +6,7 @@ import br.com.unisinos.damasredes.mensagem.Status;
 import br.com.unisinos.damasredes.mensagem.Tipo;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
+import org.apache.log4j.BasicConfigurator;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,6 +19,7 @@ import java.net.Socket;
 public class Servidor {
 
     public static void main(String[] args) throws ClassNotFoundException, IOException {
+        BasicConfigurator.configure();
         Servidor servidor = new Servidor();
 
         MensagemServidor mensagemInicio = MensagemServidor.builder()
@@ -34,18 +36,16 @@ public class Servidor {
                 .tipo(Tipo.INFORMACAO)
                 .build();
 
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(servidor.getClientA().getOutputStream())) {
-            outputStream.writeObject(mensagemInicio);
-        }
+        ObjectOutputStream outputStream = new ObjectOutputStream(servidor.getClientA().getOutputStream());
+        outputStream.writeObject(mensagemInicio);
+        outputStream.flush();
 
-        try (ObjectInputStream inputStream = new ObjectInputStream(servidor.getClientA().getInputStream())) {
-            MensagemCliente mensagem = (MensagemCliente) inputStream.readObject();
-            System.out.println(mensagem.toString());
-        }
+        ObjectInputStream inputStream = new ObjectInputStream(servidor.getClientA().getInputStream());
+        MensagemCliente mensagem = (MensagemCliente) inputStream.readObject();
+        System.out.println(mensagem.toString());
 
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(servidor.getClientA().getOutputStream())) {
-            outputStream.writeObject(mensagemVitoria);
-        }
+        outputStream.writeObject(mensagemVitoria);
+        outputStream.flush();
 
         servidor.closeConnections();
     }
@@ -59,6 +59,7 @@ public class Servidor {
 
     private Servidor() {
         start();
+        initializeData();
     }
 
     private void start() {
