@@ -17,8 +17,8 @@ public class ParCoordenadas {
         if (input == null || PATTERN.matcher(input).matches()) {
             valido = true;
             String[] numbers = input.split(",");
-            int x = Integer.parseInt(numbers[0]);
-            int y = Integer.parseInt(numbers[1]);
+            this.x = Integer.parseInt(numbers[0]);
+            this.y = Integer.parseInt(numbers[1]);
         } else {
             valido = false;
         }

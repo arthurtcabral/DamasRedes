@@ -15,7 +15,7 @@ public class MensagemServidor implements Serializable {
     private String mensagem;
     private Status status;
     private Tipo tipo;
-    private String[][] tabuleiro;
+    private int[][] tabuleiro;
 
     public boolean isGameOver() {
         return status != Status.JOGANDO;

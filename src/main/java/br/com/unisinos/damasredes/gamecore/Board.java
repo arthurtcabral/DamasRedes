@@ -1,7 +1,10 @@
 package br.com.unisinos.damasredes.gamecore;
 
+import lombok.Getter;
+
 import java.awt.*;
 
+@Getter
 public class Board {
 
 	private static final int
@@ -83,11 +86,13 @@ public class Board {
 		return true;
 	}
 
-	public void play(int turn, Point startPosition, Point endPosition) {
+	public boolean play(int turn, Point startPosition, Point endPosition) {
 		if (canMove(turn, startPosition, endPosition) ) {
 			board[startPosition.y][startPosition.x] = EMPTY;
 			board[endPosition.y][endPosition.x] = turn;
+			return true;
 		}
+		return false;
 	}
 
 	public void print() {

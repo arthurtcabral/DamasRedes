@@ -21,12 +21,14 @@ public class Cliente {
     private int[] posicaoDeOrigem;
     private int[] posicaoDeDestino;
     private Socket server;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Cliente cliente = new Cliente();
+        BasicConfigurator.configure();
 
         while (true) {
-            BasicConfigurator.configure();
             MensagemServidor mensagem = cliente.waitForMessage();
 
             printGameScreen(mensagem);
@@ -47,19 +49,20 @@ public class Cliente {
         cliente.closeConnection();
     }
 
-    private Cliente() {
+    private Cliente() throws IOException {
         start();
     }
 
-    private void start() {
+    private void start() throws IOException {
         server = estabelecerConexao();
+        inputStream = new ObjectInputStream(server.getInputStream());
+        outputStream = new ObjectOutputStream(server.getOutputStream());
         System.out.println("Conexão estabelecida.");
     }
 
-    private MensagemServidor waitForMessage() {
+    private MensagemServidor  waitForMessage() {
         try {
-            ObjectInputStream fromServer = new ObjectInputStream(server.getInputStream());
-            return (MensagemServidor) fromServer.readObject();
+            return (MensagemServidor) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             log.error("Problema na leitura do socket do servidor.", e);
             throw new RuntimeException("Problema na leitura do socket do servidor", e);
@@ -68,9 +71,8 @@ public class Cliente {
 
     private void enviarJogada(MensagemCliente jogada) {
         try {
-            ObjectOutputStream toServer = new ObjectOutputStream(server.getOutputStream());
-            toServer.writeObject(jogada);
-            toServer.flush();
+            outputStream.writeObject(jogada);
+            outputStream.flush();
         } catch (IOException e) {
             log.error("Problema na escrita do socket do servidor.", e);
             throw new RuntimeException("Problema na escrita do socket do servidor", e);

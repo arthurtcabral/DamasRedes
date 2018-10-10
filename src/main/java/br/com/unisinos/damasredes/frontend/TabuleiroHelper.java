@@ -8,21 +8,7 @@ public class TabuleiroHelper {
     private static final String HORIZONTAL_BORDER = "  ─────────────────  \n";
     private static final String GAME_LINE = "%d| %s %s %s %s %s %s %s %s |\n";
 
-    public static void main(String[] args) {
-        String[][] tab = {
-                {"x", " ", "x", " ", "x", " ", "x", " "},
-                {" ", "x", " ", "x", " ", "x", " ", "x"},
-                {"x", " ", "x", " ", "x", " ", "x", " "},
-                {" ", " ", " ", " ", " ", " ", " ", " "},
-                {" ", " ", " ", " ", " ", " ", " ", " "},
-                {" ", "o", " ", "o", " ", "o", " ", "o"},
-                {"o", " ", "o", " ", "o", " ", "o", " "},
-                {" ", "o", " ", "o", " ", "o", " ", "o"}
-        };
-        System.out.println(print(tab));
-    }
-
-    public static String print(String[][] tabuleiro) {
+    public static String print(int[][] tabuleiro) {
         StringBuilder builder = new StringBuilder()
                 .append(LABELS_HEADER)
                 .append(HORIZONTAL_BORDER);
@@ -36,7 +22,7 @@ public class TabuleiroHelper {
                 .toString();
     }
 
-    private static String getLine(int y, String[][] tab) {
+    private static String getLine(int y, int[][] tab) {
         return format(GAME_LINE, y, tab[y][0], tab[y][1], tab[y][2], tab[y][3], tab[y][4], tab[y][5], tab[y][6], tab[y][7]);
     }
 }
