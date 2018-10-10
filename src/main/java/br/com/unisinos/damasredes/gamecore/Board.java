@@ -35,15 +35,50 @@ public class Board {
 		if ((turn == 1 && endPosition.y > startPosition.y) || (turn == 2 && endPosition.y < startPosition.y)) {
 			return false;
 		}
-		if (!(endPosition.x == startPosition.x + 1 || endPosition.x == startPosition.x -1)
-				|| !(endPosition.y == startPosition.y + 1 || endPosition.y == startPosition.y -1)) {
+		int dx = endPosition.x - startPosition.x;
+		int dy = endPosition.y - startPosition.y;
+		if (Math.abs(dx) != Math.abs(dy) || Math.abs(dx) > 2 || dx == 0) {
 			return false;
+		}
+		if (Math.abs(dx) == 2) {
+			if (!isValidKill(turn, startPosition, endPosition)) {
+				return false;
+			}
 		}
 		if (board[endPosition.y][endPosition.x] != EMPTY) {
 			return false;
 		}
 		if (board[startPosition.y][startPosition.x] != turn) {
 			return false;
+		}
+		return true;
+	}
+
+	private boolean isValidKill(int turn, Point startPosition, Point endPosition) {
+		if (turn == WHITE) {
+			if (endPosition.x < startPosition.x) {
+				if (board[endPosition.y + 1][endPosition.x + 1] != BLACK) {
+					return false;
+				}
+				board[endPosition.y + 1][endPosition.x + 1] = EMPTY;
+			} else {
+				if (board[endPosition.y + 1][endPosition.x - 1] != BLACK) {
+					return false;
+				}
+				board[endPosition.y + 1][endPosition.x - 1] = EMPTY;
+			}
+		} else {
+			if (endPosition.x < startPosition.x) {
+				if (board[endPosition.y - 1][endPosition.x + 1] != WHITE) {
+					return false;
+				}
+				board[endPosition.y - 1][endPosition.x + 1] = EMPTY;
+			} else {
+				if (board[endPosition.y - 1][endPosition.x - 1] != WHITE) {
+					return false;
+				}
+				board[endPosition.y - 1][endPosition.x - 1] = EMPTY;
+			}
 		}
 		return true;
 	}
@@ -66,7 +101,9 @@ public class Board {
 
 	public static void main(String[] args) {
 		Board board = new Board();
-		board.play(BLACK, new Point(0, 2), new Point(2, 3));
+		board.play(BLACK, new Point(0, 2), new Point(1, 3));
+		board.play(WHITE, new Point(1, 5), new Point(2, 4));
+		board.play(WHITE, new Point(2, 4), new Point(0, 2));
 		board.print();
 	}
 }
