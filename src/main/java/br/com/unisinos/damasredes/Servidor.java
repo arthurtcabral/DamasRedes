@@ -64,14 +64,11 @@ public class Servidor {
         System.out.println(responseB.toString());
 
         while (!servidor.getGame().isFinished()) {
-            mensagemInicio.setTabuleiro(servidor.getGame().getBoard().getBoard());
-            mensagemInicio.setTipo(JOGADA);
-            mensagemInicio.setMensagem("FOIII");
-            outputStreamClientA.writeObject(mensagemInicio);
+            mensagemVitoria.setTabuleiro(servidor.getGame().getBoard().getBoard());
+            outputStreamClientA.writeObject(getMessage(JOGADA, servidor.getGame().getBoard().getBoard(), Status.JOGANDO));
             outputStreamClientA.flush();
 
-            mensagemInicio.setTipo(INFORMACAO);
-            outputStreamClientB.writeObject(mensagemInicio);
+            outputStreamClientB.writeObject(getMessage(INFORMACAO, servidor.getGame().getBoard().getBoard(), Status.JOGANDO));
             outputStreamClientB.flush();
 
             response = (MensagemCliente) inputStreamClientA.readObject();
@@ -79,11 +76,8 @@ public class Servidor {
             System.out.println(response.toString());
 
             // Jogador A terminou jogada, inicia a do B
-            mensagemInicio.setTabuleiro(servidor.getGame().getBoard().getBoard());
-            mensagemInicio.setTipo(JOGADA);
-            outputStreamClientB.writeObject(mensagemInicio);
-            mensagemInicio.setTipo(INFORMACAO);
-            outputStreamClientA.writeObject(mensagemInicio);
+            outputStreamClientB.writeObject(getMessage(JOGADA, servidor.getGame().getBoard().getBoard(), Status.JOGANDO));
+            outputStreamClientA.writeObject(getMessage(INFORMACAO, servidor.getGame().getBoard().getBoard(), Status.JOGANDO));
             outputStreamClientA.flush();
             outputStreamClientB.flush();
 
@@ -94,6 +88,25 @@ public class Servidor {
         }
 
         servidor.closeConnections();
+    }
+
+    private static MensagemServidor getMessage(Tipo tipo, int[][] board, Status status) {
+        return MensagemServidor.builder()
+                .mensagem("")
+                .status(status)
+                .tabuleiro(copyArray(board))
+                .tipo(tipo)
+                .build();
+    }
+
+    private static int[][] copyArray(int[][] array) {
+        int[][] copy = new int[array.length][array[0].length];
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                copy[i][j] = array[i][j];
+            }
+        }
+        return copy;
     }
 
     private Socket clientA;
