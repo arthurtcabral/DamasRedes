@@ -35,12 +35,17 @@ public class Board {
 	}
 
 	private boolean canMove(int turn, Point startPosition, Point endPosition) {
-		if ((turn == 1 && endPosition.y > startPosition.y) || (turn == 2 && endPosition.y < startPosition.y)) {
+		if ((turn == 1 && endPosition.y > startPosition.y)
+				|| (turn == 2 && endPosition.y < startPosition.y)
+				&& (board[startPosition.y][startPosition.x] != WHITE_KING && board[startPosition.y][startPosition.x] != BLACK_KING)) {
 			return false;
 		}
 		int dx = endPosition.x - startPosition.x;
 		int dy = endPosition.y - startPosition.y;
-		if (Math.abs(dx) != Math.abs(dy) || Math.abs(dx) > 2 || dx == 0) {
+		if (Math.abs(dx) != Math.abs(dy) || dx == 0) {
+			return false;
+		}
+		if (Math.abs(dx) > 2 && board[startPosition.y][startPosition.x] != turn + 2) {
 			return false;
 		}
 		if (Math.abs(dx) == 2) {
@@ -51,7 +56,7 @@ public class Board {
 		if (board[endPosition.y][endPosition.x] != EMPTY) {
 			return false;
 		}
-		if (board[startPosition.y][startPosition.x] != turn) {
+		if (board[startPosition.y][startPosition.x] != turn && board[startPosition.y][startPosition.x] != turn + 2) {
 			return false;
 		}
 		return true;
@@ -90,6 +95,11 @@ public class Board {
 		if (canMove(turn, startPosition, endPosition) ) {
 			board[startPosition.y][startPosition.x] = EMPTY;
 			board[endPosition.y][endPosition.x] = turn;
+			if (turn == WHITE && endPosition.y == 0) {
+				board[endPosition.y][endPosition.x] = turn + 2;
+			} else if (turn == BLACK && endPosition.y == 7) {
+				board[endPosition.y][endPosition.x] = turn + 2;
+			}
 			return true;
 		}
 		return false;
